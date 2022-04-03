@@ -1,37 +1,23 @@
+import { useState } from "react"
 
-let units = ["gram", "kilogram", "millilitre", "litre", "pound", "ounce"]
+let units = ["gr", "kg", "ml", "L"]
      
 function IngredientRow(props){
-    var name = props.name
-    var amount = props.amount
-    var unit = props.unit
+  
+    const [name, setName] = useState(props.name)
+    const [amount, setAmount] = useState(props.amount)
+    const [unit, setUnit] = useState(props.unit)
 
     var style = {margin: 5}
 
     return(
         <div className="row">
-            <input style={style} type="text" id="quantity" name="quantity" value={name}></input>
-            <input style={style} type="number" id="quantity" name="quantity" value={amount}></input>
-            <select>
+            <input style={style} type="text" id="quantity" name="quantity" value={name} onChange={e => setName(e.target.value)}></input>
+            <input style={style} type="number" id="quantity" name="quantity" value={amount} onChange={e => setAmount(e.target.value)}></input>
+            <select value={unit} onChange={e => setUnit(e.target.value)}>
                  {units.map(e => {
-                     switch(unit){
-                         case "kg":
-                             unit = "kilogram"
-                             break;
-                         case "gr":
-                             unit = "gram"
-                             break;    
-                         case "ml":
-                             unit = "ml"
-                             break;
-                         case "L":
-                             unit = "litre"
-                             break;        
-                     }
-                     if(e === unit)
-                        return <option selected value={e}>{e}</option>
-                    else
-                        return <option value={e}>{e}</option>
+                     return <option value={e}>{e}</option>
+                    
                  })}
             </select>
             

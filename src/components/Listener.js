@@ -5,6 +5,7 @@ import removeIcon from "../assets/delete.svg";
 import "../App.css";
 import IngredientRow from "./IngredientRow";
 import axios from "axios";
+import { __esModule } from "react-speech-recognition";
 
 function cleanPunctuation(phrase){
     return phrase.replace(".", "")
@@ -42,19 +43,61 @@ function Listener() {
           },
         },
         {
+          command: "set *",
+          callback: (phrase) => {
+              phrase = cleanPunctuation(phrase)
+                let toIndex = phrase.indexOf("to")
+                if(toIndex != -1){
+                    let spaceBeforeRemainingName = phrase.indexOf(" ", toIndex)
+                    let name = phrase.substring(0, spaceBeforeRemainingName - 3)
+                    let amount = phrase.substring(spaceBeforeRemainingName + 1, phrase.length)
+                    setAmount(name, amount)
+                
+                }
+
+          },
+        },
+        {
             command: "remove *",
             callback: (phrase) => {
                 phrase = cleanPunctuation(phrase)
-              deleteElement(phrase)
+                let amountMatch = amountRegexp.exec(phrase)
+              units.forEach(e => {
+                  let unitIndex = phrase.indexOf(e)
+                  if(unitIndex != -1){
+                      let spaceBeforeRemainingName = phrase.indexOf(" ", unitIndex)
+                      let name = phrase.substring(spaceBeforeRemainingName + 1)
+                      let copyIngredientList = ingredientList
+                      if(copyIngredientList === undefined)
+                          copyIngredientList = []
+                      decreaseElement(name, amountMatch)
+                      setIngredientList(copyIngredientList)
+                  } else{
+                    deleteElement(phrase)
+                  }
+              })
               resetTranscript();
             },
         },
         {
+          command: "double *",
+          callback: (phrase) => {
+            console.log("çalıştır")
+            stopHandle()
+            phrase = cleanPunctuation(phrase)
+            doubleQuantities(phrase);
+            resetTranscript();
+            handleListing()
+          },
+      },
+        {
             command: "I will cook *",
             callback: (phrase) => {
+                stopHandle()
                 phrase = cleanPunctuation(phrase)
                 getRecipeWithName(phrase)
                 resetTranscript()
+                handleListing()
             },
         },
         {
@@ -63,6 +106,15 @@ function Listener() {
               resetTranscript()
             },
         },
+        {
+          command: "clear",
+          callback: (phrase) => {
+            stopHandle()
+            setIngredientList([])
+            resetTranscript()
+            handleListing()
+          },
+      },
         
 
       ];
@@ -96,14 +148,57 @@ function Listener() {
         setIngredientList(newList)
     }
 
+    const doubleQuantities = (phrase) => {
+      let newList = []
+      setIngredientList([])
+      ingredientList.forEach(e => {
+        let eCopy = e
+        if(phrase === "all" || (phrase !== "all" && phrase === e.name)){
+          eCopy.amount = 2 * e.amount
+        }
+        newList.push(eCopy)
+      })
+      setIngredientList(newList)
+    }
+    const setAmount = (name, amount) => {
+      let newList = []
+      setIngredientList([])
+      ingredientList.forEach(e => {
+        let eCopy = e
+        if(name === e.name){
+          eCopy.amount = amount;
+        }
+        newList.push(eCopy)
+      })
+      setIngredientList(newList)
+    }
+
+    const decreaseElement = (name, amount) => {
+      let newList = []
+      setIngredientList([])
+      ingredientList.forEach(e => {
+        let eCopy = e
+        if(name === e.name){
+          eCopy.amount = e.amount - amount
+          console.log("Amount: " + eCopy.amount)
+          if(eCopy.amount !== "0")
+            newList.push(eCopy)
+        } else{
+          newList.push(eCopy)
+        }
+        
+      })
+      setIngredientList(newList)
+    }
+
     function getRecipeWithName(name){
         axios.get("https://webhooks.mongodb-realm.com/api/client/v2.0/app/comp537-nxhuf/service/new-endpoint/incoming_webhook/webhook0?arg1=" + name).then(response => {
             return response.data
         }).then(data => {
             let existingIngredients = ingredientList;
-            
+            // TODO: UNIT AND AMOUNT PARTS WILL BE CHANGED
             data.ingredients.replaceAll("]", '').replaceAll("[", "").replaceAll("'", "").split(",").map(e => e.trim()).forEach(ingredient => {
-                existingIngredients.push({key: name, name: ingredient, unit: "", amount: ""})
+                existingIngredients.push({key: name, name: ingredient, unit: "kg", amount: "1"})
             })
             setIngredientList(existingIngredients)
             stopHandle()
