@@ -5,16 +5,20 @@ import removeIcon from "../assets/delete.svg";
 import "../App.css";
 import IngredientRow from "./IngredientRow";
 import axios from "axios";
-import { __esModule } from "react-speech-recognition";
+import { useReactToPrint } from "react-to-print";
 
 function cleanPunctuation(phrase){
     return phrase.replace(".", "")
 }
 
 function Listener() {
+    const componentRef = useRef();
     let amountRegexp = new RegExp("[0-9]+")
     let units = ["kilogram", "gram", "millilitre", "litre", "pound", "ounce", "kg", "gr", "L", "ml"]
-            
+    const handlePrint = useReactToPrint({
+      content: () => componentRef.current
+    });
+  
     const [ingredientList, setIngredientList] = useState([])
 
     const commands = [
@@ -115,6 +119,15 @@ function Listener() {
             handleListing()
           },
       },
+      {
+        command: "to pdf",
+        callback: (phrase) => {
+          stopHandle()
+          handlePrint()
+          resetTranscript()
+          handleListing()
+        },
+    },
         
 
       ];
@@ -217,7 +230,7 @@ function Listener() {
       resetTranscript();
     };
     return (
-      <div className="column">
+      <div ref={componentRef} className="column">
         <div className="mircophone-container">
           <div
             className="microphone-icon-container"
