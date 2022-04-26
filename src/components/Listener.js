@@ -6,6 +6,8 @@ import "../App.css";
 import IngredientRow from "./IngredientRow";
 import axios from "axios";
 import { useReactToPrint } from "react-to-print";
+import {Card, Button, Row, Col} from 'react-bootstrap';
+import {BsTrashFill, BsMicFill} from 'react-icons/bs'
 
 function cleanPunctuation(phrase){
     return phrase.replace(".", "")
@@ -230,40 +232,45 @@ function Listener() {
       resetTranscript();
     };
     return (
+                 
       <div ref={componentRef} className="column">
-        <div className="mircophone-container">
-          <div
-            className="microphone-icon-container"
-            ref={microphoneRef}
-            onClick={handleListing}
-          >
-            <img width={50} heigth={50} src={microPhoneIcon} className="microphone-icon" />
-          </div>
-          {isListening && (
-            <button className="microphone-stop btn" onClick={stopHandle}>
-              Stop
-            </button>
-          )}
-        </div>
-        {transcript && (
-          <div className="microphone-result-container">
-            <div className="microphone-result-text">{transcript}</div>
-            <button className="microphone-reset btn" onClick={handleReset}>
-              Reset
-            </button>
-          </div>
-        )}
+        <Card bg="warning" border="light">
+            <Card.Header>
+            <Button style={{margin: "5px"}} ref={microphoneRef} variant="outline-dark" onClick={handleListing}><BsMicFill/></Button>
+              {isListening && (
+                <button className="microphone-stop btn" onClick={stopHandle}>
+                  Stop
+                </button>
+              )}
+            </Card.Header>
+            <Card.Body>
+              <Card.Title>{transcript && (
+                  <div className="microphone-result-container">
+                    <div className="microphone-result-text">{transcript}</div>
+                    <button className="microphone-reset btn" onClick={handleReset}>
+                      Reset
+                    </button>
+                  </div>
+                )}
+        </Card.Title>
+                <Card.Text>
 
         {ingredientList && ingredientList.map(e => {
             return (
-                <div className="row">
-                    <IngredientRow key = {e.name} name={e.name} amount = {e.amount} unit = {e.unit}></IngredientRow>
-                    <img width={50} heigth={50} style={{margin: 10}} src={removeIcon} onClick={() => deleteElement(e.name)} className="delete-icon" />
-                </div>
+                <Row>
+                    <Col xs={10}>
+                      <IngredientRow key = {e.name} name={e.name} amount = {e.amount} unit = {e.unit}></IngredientRow>
+                    </Col>
+                    <Col xs={2}>
+                      <Button style={{margin: "5px"}} variant="outline-dark" onClick={() => deleteElement(e.name)}><BsTrashFill/></Button>
+                    </Col>    
+                </Row>
             
             )
         })}
-
+            </Card.Text>
+          </Card.Body>
+        </Card>
       </div>
 
       
