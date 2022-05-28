@@ -100,6 +100,9 @@ function Listener() {
                 
                 
 
+
+                //comprehend.detectEntities(params, function(err, data) {
+
                   let data = {Entities: [{Type: "FOOD", Text: "carrots"}, {Type: "FOOD", Text: "hamburger"}]}
                   let err;
                   let foodIndices = []
