@@ -93,19 +93,12 @@ function Listener() {
               }  
                 var params = {
                   Text: phrase, /* required */
-                  EndpointArn: "arn:aws:comprehend:us-east-1:170700127604:entity-recognizer-endpoint/test",
+                  EndpointArn: "",
                   LanguageCode: "en"
                 };
 
                 
-                /*const comprehend = new AWS.Comprehend({ credentials:{
-                                                            accessKeyId: "AKIASPPUFHV2NABFMB23",
-                                                            secretAccessKey: "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"
-                                                          },
-                                                        region: "us-east-1"});*/
-
-
-                //comprehend.detectEntities(params, function(err, data) {
+                
 
                   let data = {Entities: [{Type: "FOOD", Text: "carrots"}, {Type: "FOOD", Text: "hamburger"}]}
                   let err;
